@@ -72,10 +72,11 @@ func fetchRespRateData() {
         guard let sample = results?.first as? HKQuantitySample else { return }
         let rate = sample.quantity.doubleValue(for: HKUnit(from: "breaths/min"))
         print("is resp rate ok??")
+        let testRate = 25
         // Check for abnormal respiratory rate (example: above 30)
-        if rate > 30 {
+        if testRate > 20 {
             self.triggerEmergency() // Trigger emergency if rate is abnormal
-            print("resp rate is greater than 30 breaths per min!!")
+            print("resp rate is greater than 20 breaths per min!!")
         }
     }
 
@@ -90,18 +91,15 @@ func fetchBPData() {
         guard let sample = results?.first as? HKQuantitySample else { return }
         let systolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
         print("is bp ok??")
-        if systolic > 180 { // Example abnormal blood pressure
+        let testSystolic = 200
+        let testDiastolic = 130
+        if testSystolic > 180 && testDiastolic > 120 { // Example abnormal blood pressure
             self.triggerEmergency() // Trigger emergency if blood pressure is abnormal
-            print("systolic bp is higher than 180!!")
+            print("blood pressure is higher than 180/120!!")
         }
     }
 
     healthStore.execute(query)
-}
-
-func triggerEmergencyResponse() {
-    // Simulate voice instructions using text-to-speech
-    print("listen up folks...")
 }
 
 }
