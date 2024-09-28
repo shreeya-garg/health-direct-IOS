@@ -1,0 +1,101 @@
+import UIKit
+import HealthKit
+
+class ViewController: UIViewController {
+    let healthStore = HKHealthStore()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        requestPermission()
+    }
+
+    func requestPermission() {
+        let readTypes: Set = [
+            HKObjectType.quantityType(forIdentifier: .respRate)!,
+            HKObjectType.quantityType(forIdentifier: .bpSystolic)!,
+            HKObjectType.quantityType(forIdentifier: .bpDiastolic)!
+        ]
+
+        healthStore.requestAuthorization(toShare: [], read: readTypes) { (success, error) in
+            if success {
+                // Authorization succeeded, start monitoring
+                self.monitoring()
+            } else {
+                // Handle error
+                print("Not authorized by the user to collect health monitoring data: \(String(describing: error))")
+            }
+        }
+    }
+
+    func monitoring() {
+        monitorRespRate()
+        monitorBP()
+    }
+
+    func monitorRespRate() {
+    let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
+    let query = HKObserverQuery(sampleType: respRateType, predicate: nil) { query, completionHandler, error in
+        if let error = error {
+            print("Error observing respiratory rate: \(error.localizedDescription)")
+            return
+        }
+        self.fetchRespiratoryRateData()
+        completionHandler()
+    }
+
+    healthStore.execute(query)
+}
+
+func monitorBP() {
+    let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!
+    let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+
+    let query = HKObserverQuery(sampleType: systolicType, predicate: nil) { query, completionHandler, error in
+        if let error = error {
+            print("Error observing blood pressure: \(error.localizedDescription)")
+            return
+        }
+        self.fetchBPData()
+        completionHandler()
+    }
+
+    healthStore.execute(query)
+}
+
+func fetchRespRateData() {
+    let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
+    let query = HKSampleQuery(sampleType: respRateType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
+        guard let sample = results?.first as? HKQuantitySample else { return }
+        let rate = sample.quantity.doubleValue(for: HKUnit(from: "breaths/min"))
+
+        // Check for abnormal respiratory rate (example: above 30)
+        if rate > 30 {
+            self.triggerEmergency() // Trigger emergency if rate is abnormal
+        }
+    }
+
+    healthStore.execute(query)
+}
+
+func fetchBPData() {
+    let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!
+    let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+
+    let query = HKSampleQuery(sampleType: systolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
+        guard let sample = results?.first as? HKQuantitySample else { return }
+        let systolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
+
+        if systolic > 180 { // Example abnormal blood pressure
+            self.triggerEmergency() // Trigger emergency if blood pressure is abnormal
+        }
+    }
+
+    healthStore.execute(query)
+}
+
+func triggerEmergencyResponse() {
+    // Simulate voice instructions using text-to-speech
+    print("listen up folks...")
+}
+
+}
