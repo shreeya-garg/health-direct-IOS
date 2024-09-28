@@ -2,8 +2,8 @@
 
 import SwiftUI
 import AVFoundation
-import emergency
-import healthkit
+//import emergency
+//import healthkit
 
 
 struct ContentView: View {
@@ -16,7 +16,8 @@ struct ContentView: View {
     @State private var med_data: String = ""
     @State private var dailyWaterIntake: String = ""
     @State private var navigateToConfirmation: Bool = false
-    
+    @State private var medicalResponse: String = "loading"
+    let healthModel = MedicalAssistant()
     var sexes = ["Sex", "Female", "Male"]
     
     var body: some View {
@@ -100,6 +101,23 @@ struct ContentView: View {
                                 .shadow(radius: 5)
                         }
                     }
+                    
+                    Text(medicalResponse)
+                        .padding()
+                        .multilineTextAlignment(.center)
+                    }
+                    .padding()
+                    .task {
+                        do {
+                            medicalResponse = try await healthModel.generateMedicalResponse(
+                                     userHistory: "female user, age 70, has chronic low blood sugar issues",
+                                     biometricData: "heart rate is 100 bpm; blood pressure is 80/50",
+                                     context: "user feels very faint"
+                                 )
+                             } catch {
+                                 medicalResponse = "Error: \(error.localizedDescription)"
+                             }
+                    }
                 }
                 .padding()
             }
@@ -107,7 +125,7 @@ struct ContentView: View {
     }
 
 
-}
+
 
 func format_information(medications: String, med_conditions: String, age: String, sex: String, daily_water_intake: String) {
     var error_msg: String = ""
@@ -191,10 +209,10 @@ class SpeechManager {
 
 
 
-#Preview {
+/* /#Preview {
     ContentView()
 }
 
 #Preview {
     SubmitConfirmationView()
-}
+} */
