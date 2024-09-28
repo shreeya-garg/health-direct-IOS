@@ -15,7 +15,7 @@ class ViewController: UIViewController {
             HKObjectType.quantityType(forIdentifier: .bpSystolic)!,
             HKObjectType.quantityType(forIdentifier: .bpDiastolic)!
         ]
-
+        print("requesting permission")
         healthStore.requestAuthorization(toShare: [], read: readTypes) { (success, error) in
             if success {
                 // Authorization succeeded, start monitoring
@@ -30,6 +30,7 @@ class ViewController: UIViewController {
     func monitoring() {
         monitorRespRate()
         monitorBP()
+        print("monitoring...")
     }
 
     func monitorRespRate() {
@@ -39,8 +40,9 @@ class ViewController: UIViewController {
             print("Error observing respiratory rate: \(error.localizedDescription)")
             return
         }
-        self.fetchRespiratoryRateData()
+        self.fetchRespRateData()
         completionHandler()
+        print("monitoring respiratory rate...")
     }
 
     healthStore.execute(query)
@@ -57,6 +59,7 @@ func monitorBP() {
         }
         self.fetchBPData()
         completionHandler()
+        print("monitoring blood pressure...")
     }
 
     healthStore.execute(query)
@@ -67,10 +70,11 @@ func fetchRespRateData() {
     let query = HKSampleQuery(sampleType: respRateType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
         guard let sample = results?.first as? HKQuantitySample else { return }
         let rate = sample.quantity.doubleValue(for: HKUnit(from: "breaths/min"))
-
+        print("is resp rate ok??")
         // Check for abnormal respiratory rate (example: above 30)
         if rate > 30 {
             self.triggerEmergency() // Trigger emergency if rate is abnormal
+            print("resp rate is greater than 30 breaths per min!!")
         }
     }
 
@@ -84,9 +88,10 @@ func fetchBPData() {
     let query = HKSampleQuery(sampleType: systolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
         guard let sample = results?.first as? HKQuantitySample else { return }
         let systolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
-
+        print("is bp ok??")
         if systolic > 180 { // Example abnormal blood pressure
             self.triggerEmergency() // Trigger emergency if blood pressure is abnormal
+            print("systolic bp is higher than 180!!")
         }
     }
 
@@ -97,5 +102,7 @@ func triggerEmergencyResponse() {
     // Simulate voice instructions using text-to-speech
     print("listen up folks...")
 }
+
+
 
 }
