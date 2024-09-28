@@ -1,39 +1,9 @@
-//
-//  ContentView.swift
-//  health direct
-//
 //  Created by Shreeya Garg on 9/28/24.
-//
-
-//import SwiftUI
-//
-//struct ContentView: View {
-//    var body: some View {
-//        VStack {
-//            Image(systemName: "globe")
-//                .imageScale(.large)
-//                .foregroundStyle(.tint)
-//            Text("Hello, world!")
-//        }
-//        .padding()
-//    }
-//}
-//
-//#Preview {
-//    ContentView()
-//}
-
-//
-//  ContentView.swift
-//  healthDirect Watch App
-//
-//  Created by Shreeya Garg on 9/28/24.
-//
 
 import SwiftUI
 import AVFoundation
-
-
+import emergency
+import healthkit
 
 
 struct ContentView: View {
@@ -214,6 +184,9 @@ class SpeechManager {
         speechSynthesizer.speak(utterance)
     }
 }
+
+
+
 
 
 

@@ -1,3 +1,4 @@
+import SwiftUI
 import UIKit
 import HealthKit
 
@@ -102,7 +103,5 @@ func triggerEmergencyResponse() {
     // Simulate voice instructions using text-to-speech
     print("listen up folks...")
 }
-
-
 
 }
