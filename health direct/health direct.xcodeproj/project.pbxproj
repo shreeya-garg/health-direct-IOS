@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		CE3421442CA8B0C100FC7FDC /* healthkit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3421432CA8B0C100FC7FDC /* healthkit.swift */; };
 		CE43948F2CA8D09400BDFC20 /* health-direct-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CE43948E2CA8D09400BDFC20 /* health-direct-Info.plist */; };
+		CE573B832CA958E200BABC53 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE573B822CA958E200BABC53 /* SpeechManager.swift */; };
 		CEB5F4182CA889C9003C7515 /* health_directApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB5F4172CA889C9003C7515 /* health_directApp.swift */; };
 		CEB5F41A2CA889C9003C7515 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB5F4192CA889C9003C7515 /* ContentView.swift */; };
 		CEB5F41C2CA889CB003C7515 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEB5F41B2CA889CB003C7515 /* Assets.xcassets */; };
@@ -39,6 +40,7 @@
 		CE0758442CA8B90D00EE17F0 /* health direct.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "health direct.entitlements"; sourceTree = "<group>"; };
 		CE3421432CA8B0C100FC7FDC /* healthkit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = healthkit.swift; sourceTree = "<group>"; };
 		CE43948E2CA8D09400BDFC20 /* health-direct-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "health-direct-Info.plist"; sourceTree = SOURCE_ROOT; };
+		CE573B822CA958E200BABC53 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
 		CEB5F4142CA889C9003C7515 /* health direct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "health direct.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB5F4172CA889C9003C7515 /* health_directApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = health_directApp.swift; sourceTree = "<group>"; };
 		CEB5F4192CA889C9003C7515 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				CEB5F4172CA889C9003C7515 /* health_directApp.swift */,
 				CE43948E2CA8D09400BDFC20 /* health-direct-Info.plist */,
 				CEB5F4192CA889C9003C7515 /* ContentView.swift */,
+				CE573B822CA958E200BABC53 /* SpeechManager.swift */,
 				CEB5F41B2CA889CB003C7515 /* Assets.xcassets */,
 				CEB5F41D2CA889CB003C7515 /* Preview Content */,
 				CE3421432CA8B0C100FC7FDC /* healthkit.swift */,
@@ -267,6 +270,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEB5F41A2CA889C9003C7515 /* ContentView.swift in Sources */,
+				CE573B832CA958E200BABC53 /* SpeechManager.swift in Sources */,
 				CE3421442CA8B0C100FC7FDC /* healthkit.swift in Sources */,
 				CEB5F4182CA889C9003C7515 /* health_directApp.swift in Sources */,
 			);

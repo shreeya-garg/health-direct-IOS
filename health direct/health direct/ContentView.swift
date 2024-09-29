@@ -47,6 +47,8 @@ struct ContentView: View {
     @State private var med_data: String = ""
     @State private var dailyWaterIntake: String = ""
     @State private var navigateToConfirmation: Bool = false
+
+
     
     var sexes = ["Sex", "Female", "Male"]
     
@@ -121,7 +123,7 @@ struct ContentView: View {
                                         
                     NavigationLink(destination: SubmitConfirmationView(medications: medications, med_conditions: med_conditions, dailyWaterIntake: dailyWaterIntake, age: age, sex: sex), isActive: $navigateToConfirmation) {
                         Button(action: {
-                            format_information(medications: medications, med_conditions: med_conditions, age: age, sex: sex, daily_water_intake: dailyWaterIntake)
+          /*                  format_information(medications: medications, med_conditions: med_conditions, age: age, sex: sex, daily_water_intake: dailyWaterIntake) */
                             navigateToConfirmation = true // Trigger navigation
                         }) {
                             Image("SubmitButton")
@@ -140,7 +142,9 @@ struct ContentView: View {
 
 }
 
-func format_information(medications: String, med_conditions: String, age: String, sex: String, daily_water_intake: String) {
+
+
+/* func format_information(medications: String, med_conditions: String, age: String, sex: String, daily_water_intake: String) {
     var error_msg: String = ""
     var emergency = "fall"
     var med_data = medications + " " + med_conditions + " " + age + " " + sex + " " + daily_water_intake
@@ -155,11 +159,13 @@ func format_information(medications: String, med_conditions: String, age: String
     
     print(prompt)
 
-}
+} */
 
 
 struct SubmitConfirmationView: View {
     @ObservedObject var viewModel = HealthKitManager()
+   // @State private var navigateToEmergency: Bool = true
+    @State private var isRealEmergency: Bool = false
     let speechManager = SpeechManager()
     
     var medications: String
@@ -247,6 +253,11 @@ struct SubmitConfirmationView: View {
                 }
                 
             }
+
+            NavigationLink(destination: EmergencyView(healthKitManager: viewModel), isActive: $viewModel.validEmergency) {
+                                EmptyView()
+            }
+
             //            .bold
             //            .foreground(Color(red: 209, green: 8, blue: 22))
             //            .imageScale(.small)
@@ -255,6 +266,92 @@ struct SubmitConfirmationView: View {
 
 
 }
+/*struct EmergencyView: View {
+    @State private var navigateToEmergency: Bool = true
+    @State private var navigateToConfirmation: Bool = false
+    @State private var context: String = ""
+    @State private var validEmergency = true
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("Input any context about the emergency here:")
+                .bold()
+                .padding()
+
+
+                TextField(
+                        "",
+                        text: $context
+                    )
+                    .cornerRadius(15)
+                    .background(Color.white)
+                    .shadow(radius:5)
+                    .padding(.bottom, 10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.red, lineWidth: 2) // Outline color and width
+                )
+
+                NavigationLink(destination: SubmitConfirmationView(medications: medications, med_conditions: med_conditions, dailyWaterIntake: dailyWaterIntake, age: age, sex: sex), isActive: $navigateToConfirmation) {
+                    Button(action: {
+                        navigateToConfirmation = true // Trigger navigation
+                        validEmergency = false
+                        
+                    }) {
+                        Image("FalseAlarmButton")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 100, height: 50)
+                            .shadow(radius: 5)
+                    }
+                }
+
+
+            }
+
+
+        }
+    }
+}*/
+
+struct EmergencyView: View {
+    @ObservedObject var healthKitManager: HealthKitManager
+    @State var context: String = ""
+
+    var body: some View {
+        VStack {
+            Text("Emergency detected. Please provide additional context.")
+            
+            TextField(
+                "",
+                text: $context
+            )
+            .cornerRadius(15)
+            .background(Color.white)
+            .shadow(radius:5)
+            .padding(.bottom, 10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                .stroke(Color.red, lineWidth: 2) // Outline color and width
+        )
+
+            
+//            Button("False Alarm") {
+//                healthKitManager.validEmergency = false // Set false alarm
+//                healthKitManager.testRate = 20
+//
+//            }
+//
+//            Button("Confirm Emergency") {
+//                // Handle emergency confirmation
+//                healthKitManager.validEmergency = true // Set false alarm
+//            }
+        }
+    }
+}
+
+
 
 //func vocalizer() {
 //    // Usage
@@ -265,27 +362,38 @@ struct SubmitConfirmationView: View {
 //}
 
 
-class SpeechManager {
-    let speechSynthesizer = AVSpeechSynthesizer()
-    
-    func configureAudioSession() {
-        let audioSession = AVAudioSession.sharedInstance()
+
+
+
+//let soundManager = SoundManager()
+
+
+   
+
+
+
+
+
+/*class SoundManager {
+    var audioPlayer: AVAudioPlayer?
+
+
+    func playAlertSound() {
+        guard let url = Bundle.main.url(forResource: "alert", withExtension: "mp3") else {
+            print("Sound file not found")
+            return
+        }
+       
         do {
-            try audioSession.setCategory(.playback, mode: .default, options: .defaultToSpeaker)
-            try audioSession.setActive(true)
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
         } catch {
-            print("Failed to set audio session category: \(error)")
+            print("Error playing sound: \(error.localizedDescription)")
         }
     }
-    
-    func speakText(_ text: String) {
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
-        utterance.rate = 0.5
-        utterance.prefersAssistiveTechnologySettings = true
-        speechSynthesizer.speak(utterance)
-    }
-}
+} */
+
+
 
 
 

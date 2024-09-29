@@ -7,6 +7,8 @@
 
 import SwiftUI
 import HealthKit
+import AVFoundation
+//import SpeechManager
 
 // HealthKit Manager class to handle HealthKit operations
 class HealthKitManager: ObservableObject {
@@ -18,6 +20,7 @@ class HealthKitManager: ObservableObject {
     @Published var testDiastolic: Double?
     @Published var testHeartRate: Double?
     @Published var testActualHeartRate: Double?
+    var validEmergency : Bool
     
     init() {
         self.testSystolic = 0.0
@@ -26,6 +29,8 @@ class HealthKitManager: ObservableObject {
         self.testHeartRate = 0.0
         self.testActualHeartRate = 0.0
         self.isAuthorized = false
+        self.validEmergency = false
+        
         requestPermission()
     }
     
@@ -196,10 +201,10 @@ class HealthKitManager: ObservableObject {
         healthStore.execute(diastolicQuery)
     }
     
-    func triggerEmergencyResponse() {
+   /* func triggerEmergencyResponse() {
         print("Emergency detected! listen up folks...")
         // You can implement text-to-speech or any other response mechanism here
-    }
+    } */
     
 //    HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
 
@@ -238,7 +243,7 @@ class HealthKitManager: ObservableObject {
             
             DispatchQueue.main.async {
                 self.testHeartRate = Double(self.testHeartRate ?? 72)
-                if (self.testHeartRate ?? 72 > 105) {
+                if (self.testHeartRate ?? 72 > 120) {
                     self.triggerEmergencyResponse()
                     print("heart rate is higher than 105!")
                 }
@@ -292,6 +297,17 @@ class HealthKitManager: ObservableObject {
             
         }
         healthStore.execute(query)
+    }
+    
+    func triggerEmergencyResponse() {
+        validEmergency = true
+        //navigateToEmergency = true
+        if (validEmergency) {
+            let speechManager = SpeechManager()
+           // soundManager.playAlertSound()
+            speechManager.configureAudioSession()
+            speechManager.speakText("User is potentially facing a medical emergency. Please select no or write any situational context in the textbox provided.")
+        }
     }
 
 }
