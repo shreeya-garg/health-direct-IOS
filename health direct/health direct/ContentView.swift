@@ -32,6 +32,7 @@
 
 import SwiftUI
 import AVFoundation
+//import HealthKitManager
 
 
 
@@ -118,7 +119,7 @@ struct ContentView: View {
                     .shadow(radius: 1)
                     .padding(.bottom, 10)
                                         
-                    NavigationLink(destination: SubmitConfirmationView(), isActive: $navigateToConfirmation) {
+                    NavigationLink(destination: SubmitConfirmationView(medications: medications, med_conditions: med_conditions, dailyWaterIntake: dailyWaterIntake, age: age, sex: sex), isActive: $navigateToConfirmation) {
                         Button(action: {
                             format_information(medications: medications, med_conditions: med_conditions, age: age, sex: sex, daily_water_intake: dailyWaterIntake)
                             navigateToConfirmation = true // Trigger navigation
@@ -161,28 +162,85 @@ struct SubmitConfirmationView: View {
     @ObservedObject var viewModel = HealthKitManager()
     let speechManager = SpeechManager()
     
+    var medications: String
+    var med_conditions: String
+    var dailyWaterIntake: String
+    var age: String
+    var sex: String
+    
     var body: some View {
         VStack {
-            Text("Thank You!")
-                .font(.largeTitle)
-                .padding()
-            Text("Your information has been submitted.")
-                .font(.subheadline)
-                .padding()
-        }
-        .navigationTitle("Confirmation") // Title for the new view
-        
-        Button {
-            speechManager.speakText("Thank you for submitting your information. Please follow the instructions accordingly.")
-            print("PRESSED")
-        } label: {
-            Image("SubmitButton")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 100, height: 50)
-                .shadow(radius: 5)
+            HStack {
+                Button {
+                    speechManager.speakText("Thank you for submitting your information. Please follow the instructions accordingly.")
+                    print("Speakkkkk")
+                } label:{
+                    Image("HealthDirectLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                    
+                    
+                    Spacer()
+                }
+            }
+            
+            if let systolic = viewModel.testSystolic,
+               let diastolic = viewModel.testDiastolic,
+               let rate = viewModel.testRate {
+                
+                HStack {
+                    Image(systemName: "eyedropper.halffull")
+                    Text("Blood Pressure: \(systolic)/\(diastolic)")
+                }
+                
+                
+                HStack {
+                    Image(systemName: "lungs")
+                    Text("Respiratory Rate: \(rate)")
+                }
+                
+                HStack {
+                    Image(systemName: "bandage.fill")
+                    Text("Medications: \(medications)")
+                }
+                
+                
+                HStack {
+                    Image(systemName: "plus.square.fill")
+                    Text("Pre-existing Medical Conditions: \(med_conditions)")
+                }
+                
+                
+                HStack {
+                    Image(systemName: "drop.triangle.fill")
+                    Text("Daily Water Intake: \(dailyWaterIntake)")
+                }
+                
+                //                HStack {
+                //                    Image(systemName: "heart.person.fill")
+                //                    Text("HK Biological Sex: \(HKObjectType.characteristicType(forIdentifier: .biologicalSex))")
+                //                }
+                
+                HStack {
+                    Image(systemName: "heart.person.fill")
+                    Text("Inputted Sex: \(sex)")
+                }
+                
+                
+                HStack {
+                    Image(systemName: "eyeglasses")
+                    Text("Age: \(age)")
+                }
+                
+            }
+            //            .bold
+            //            .foreground(Color(red: 209, green: 8, blue: 22))
+            //            .imageScale(.small)
         }
     }
+
+
 }
 
 //func vocalizer() {
@@ -219,10 +277,11 @@ class SpeechManager {
 
 
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}
+//
+//#Preview {
+//    SubmitConfirmationView(medications: <#String#>, med_conditions: <#String#>, dailyWaterIntake: <#String#>, age: <#String#>, sex: <#String#>)
+//}
 
-#Preview {
-    SubmitConfirmationView()
-}
