@@ -171,6 +171,7 @@ struct SubmitConfirmationView: View {
     var body: some View {
         VStack {
             HStack {
+                Spacer()
                 Button {
                     speechManager.speakText("Thank you for submitting your information. Please follow the instructions accordingly.")
                     print("Speakkkkk")
@@ -180,14 +181,20 @@ struct SubmitConfirmationView: View {
                         .scaledToFit()
                         .frame(width: 100, height: 100)
                     
-                    
-                    Spacer()
                 }
+                
+                Spacer()
             }
             
             if let systolic = viewModel.testSystolic,
                let diastolic = viewModel.testDiastolic,
-               let rate = viewModel.testRate {
+               let rate = viewModel.testRate,
+               let heartRate = viewModel.testHeartRate {
+                
+                HStack {
+                    Image(systemName: "heart.circle.fill")
+                    Text("Heart Rate: \(heartRate)")
+                }
                 
                 HStack {
                     Image(systemName: "eyedropper.halffull")

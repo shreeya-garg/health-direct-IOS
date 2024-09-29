@@ -16,21 +16,38 @@ class HealthKitManager: ObservableObject {
     @Published var testRate: Double?
     @Published var testSystolic: Double?
     @Published var testDiastolic: Double?
+    @Published var testHeartRate: Double?
     
     init() {
         self.testSystolic = 0.0
         self.testDiastolic = 0.0
-        self.testRate = 10.0
+        self.testRate = 0.0
+        self.testHeartRate = 0.0
         self.isAuthorized = false
         requestPermission()
     }
     
     func requestPermission() {
-        let readTypes: Set = [
-            HKObjectType.quantityType(forIdentifier: .respiratoryRate)!,
-            HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!,
-            HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
-        ]
+//        let readTypes: Set<HKObjectType> = [
+//            HKObjectType.quantityType(forIdentifier: .respiratoryRate),
+//            HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic),
+//            HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)
+//        ]
+        
+        var readTypes = Set<HKObjectType>()
+            
+        if let respiratoryRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate) {
+            readTypes.insert(respiratoryRateType)
+        }
+        if let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic) {
+            readTypes.insert(systolicType)
+        }
+        if let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic) {
+            readTypes.insert(diastolicType)
+        }
+        if let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate) {
+            readTypes.insert(hrType)
+        }
         
         healthStore.requestAuthorization(toShare: [], read: readTypes) { (success, error) in
             DispatchQueue.main.async {
@@ -43,35 +60,46 @@ class HealthKitManager: ObservableObject {
             }
         }
         
-        print("resp requestPermission" + String(self.testRate!))
+//        print("resp requestPermission" + String(self.testRate ?? 35))
     }
     
     func startMonitoring() {
         monitorRespRate()
         monitorBP()
-        print("resp startMonitoring" + String(self.testRate!))
+        monitorHR()
+//        print("resp startMonitoring" + String(self.testRate!))
         print("monitoring...")
     }
     
     func monitorRespRate() {
-        let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
+        guard let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)
+        else {
+            print("error")
+            return
+        }
         fetchRespRateData()
         let query = HKObserverQuery(sampleType: respRateType, predicate: nil) { [weak self] query, completionHandler, error in
             if let error = error {
                 print("Error observing respiratory rate: \(error.localizedDescription)")
                 return
             }
-            print("resp monitorRespRate" + String(self!.testRate!))
+            print("resp monitorRespRate" + String(self?.testRate ?? 0))
             self?.fetchRespRateData()
             completionHandler()
-            print("monitoring respiratory rate..." + String(self!.testRate!))
+            print("monitoring respiratory rate..." + String(self?.testRate ?? 0))
         }
         healthStore.execute(query)
     }
+
+
     
     func monitorBP() {
-        let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!
-        let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+        guard let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic) else {
+            return
+        }
+        guard let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic) else {
+            return
+        }
         
         let query = HKObserverQuery(sampleType: systolicType, predicate: nil) { [weak self] query, completionHandler, error in
             if let error = error {
@@ -86,22 +114,27 @@ class HealthKitManager: ObservableObject {
     }
     
     func fetchRespRateData() {
-        let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)!
-        print(respRateType)
-        let query = HKSampleQuery(sampleType: respRateType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
+     guard let respRateType = HKObjectType.quantityType(forIdentifier: .respiratoryRate)
+        else {
+            return
+        }
+       // print(respRateType)
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let query = HKSampleQuery(sampleType: respRateType, predicate: nil, limit: 1, sortDescriptors: [sortDescriptor]) { (query, results, error) in
             print(results?.first)
             guard let sample = results?.first as? HKQuantitySample else { return }
-            let rate = sample.quantity.doubleValue(for: HKUnit(from: "breaths/min"))
+            let rate = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: HKUnit.minute()))
             print("Fetched respiratory rate: \(rate)")
 //            let testRate = 35
-            self.testRate = 35
-            print("is resp rate ok??")
+            //self.testRate = 35
+            self.testRate = rate
+           // print("is resp rate ok??")
             DispatchQueue.main.async {
-                self.testRate = Double(self.testRate!)
-                print("Updated respiratory rate: \(self.testRate!)")
-                if (self.testRate! > 30) {
+                self.testRate = Double(self.testRate ?? 35)
+                print("Updated respiratory rate: \(self.testRate ?? 35)")
+                if (self.testRate ?? 35 > 30) {
                     self.triggerEmergencyResponse()
-                    print("resp rate is greater than 20 breaths per min!!")
+                 //   print("resp rate is greater than 20 breaths per min!!")
                 }
             }
         }
@@ -109,34 +142,44 @@ class HealthKitManager: ObservableObject {
     }
     
     func fetchBPData() {
-        let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)!
-        let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)!
+        guard let systolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureSystolic)
+        else {
+            return
+        }
+        guard let diastolicType = HKObjectType.quantityType(forIdentifier: .bloodPressureDiastolic)
+        else {
+            return
+        }
         
-        let systolicQuery = HKSampleQuery(sampleType: systolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
+        let sortDescriptorSystolic = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let systolicQuery = HKSampleQuery(sampleType: systolicType, predicate: nil, limit: 1, sortDescriptors: [sortDescriptorSystolic]) { (query, results, error) in
             guard let sample = results?.first as? HKQuantitySample else { return }
             let systolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
             print("Fetched systolic BP: \(systolic)")
 //            let testSystolic = 200
-            self.testSystolic = 200
+//            self.testSystolic = 200
+            self.testSystolic = systolic
             print("is bp systolic ok??")
             DispatchQueue.main.async {
-                self.testSystolic = Double(self.testSystolic!)
-                if (self.testSystolic! > 180) {
+                self.testSystolic = Double(self.testSystolic ?? 35)
+                if (self.testSystolic ?? 35 > 180) {
                     self.triggerEmergencyResponse()
                     print("blood pressure is higher than 180/120!!")
                 }
             }
         }
         
-        let diastolicQuery = HKSampleQuery(sampleType: diastolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
+        let sortDescriptorDiastolic = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        let diastolicQuery = HKSampleQuery(sampleType: diastolicType, predicate: nil, limit: 1, sortDescriptors: [sortDescriptorDiastolic]) { (query, results, error) in
             guard let sample = results?.first as? HKQuantitySample else { return }
             let diastolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
 //            let testDiastolic = 130
-            self.testDiastolic = 130
+//            self.testDiastolic = 130
+            self.testDiastolic = diastolic
             print("is bp diastolic ok??")
             DispatchQueue.main.async {
-                self.testDiastolic = Double(self.testDiastolic!)
-                if (self.testDiastolic! > 120) {
+                self.testDiastolic = Double(self.testDiastolic ?? 34)
+                if (self.testDiastolic ?? 34 > 120) {
                     self.triggerEmergencyResponse()
                     print("blood pressure is higher than 180/120!!")
                 }
@@ -151,6 +194,55 @@ class HealthKitManager: ObservableObject {
         print("Emergency detected! listen up folks...")
         // You can implement text-to-speech or any other response mechanism here
     }
+    
+//    HKObjectType.quantityType(forIdentifier: .restingHeartRate)!
+
+
+    func monitorHR() {
+        guard let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate) else {
+            return
+        }
+        
+        let query = HKObserverQuery(sampleType: hrType, predicate: nil) { [weak self] query, completionHandler, error in
+            if let error = error {
+                print("Error observing heart rate: \(error.localizedDescription)")
+                return
+            }
+            self?.fetchHRData()
+            completionHandler()
+            print("monitoring heart rate...")
+        }
+        healthStore.execute(query)
+    }
+
+
+    func fetchHRData() {
+        guard let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate) else {
+            return
+        }
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+           
+        let query = HKSampleQuery(sampleType: hrType, predicate: nil, limit: 1, sortDescriptors: [sortDescriptor]) { (query, results, error) in
+            guard let sample = results?.first as? HKQuantitySample else { return }
+            let heart_rate = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: HKUnit.minute()))
+            print("is heart rate??")
+            
+            self.testHeartRate = heart_rate
+            
+            DispatchQueue.main.async {
+                self.testHeartRate = Double(self.testHeartRate ?? 72)
+                if (self.testHeartRate ?? 72 > 105) {
+                    self.triggerEmergencyResponse()
+                    print("heart rate is higher than 105!")
+                }
+                
+            }
+            
+        }
+        healthStore.execute(query)
+    }
+
 }
 
 // SwiftUI View to display health data and trigger monitoring
