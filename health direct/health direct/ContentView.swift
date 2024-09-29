@@ -189,11 +189,17 @@ struct SubmitConfirmationView: View {
             if let systolic = viewModel.testSystolic,
                let diastolic = viewModel.testDiastolic,
                let rate = viewModel.testRate,
-               let heartRate = viewModel.testHeartRate {
+               let heartRate = viewModel.testHeartRate,
+               let actualHeartRate = viewModel.testActualHeartRate {
                 
                 HStack {
                     Image(systemName: "heart.circle.fill")
-                    Text("Heart Rate: \(heartRate)")
+                    Text("Current Heart Rate: \(actualHeartRate)")
+                }
+                
+                HStack {
+                    Image(systemName: "heart.circle.fill")
+                    Text("Resting Heart Rate: \(heartRate)")
                 }
                 
                 HStack {

@@ -17,12 +17,14 @@ class HealthKitManager: ObservableObject {
     @Published var testSystolic: Double?
     @Published var testDiastolic: Double?
     @Published var testHeartRate: Double?
+    @Published var testActualHeartRate: Double?
     
     init() {
         self.testSystolic = 0.0
         self.testDiastolic = 0.0
         self.testRate = 0.0
         self.testHeartRate = 0.0
+        self.testActualHeartRate = 0.0
         self.isAuthorized = false
         requestPermission()
     }
@@ -48,6 +50,9 @@ class HealthKitManager: ObservableObject {
         if let hrType = HKObjectType.quantityType(forIdentifier: .restingHeartRate) {
             readTypes.insert(hrType)
         }
+        if let actualHRType = HKObjectType.quantityType(forIdentifier: .heartRate) {
+            readTypes.insert(actualHRType)
+        }
         
         healthStore.requestAuthorization(toShare: [], read: readTypes) { (success, error) in
             DispatchQueue.main.async {
@@ -67,6 +72,7 @@ class HealthKitManager: ObservableObject {
         monitorRespRate()
         monitorBP()
         monitorHR()
+        monitorActualHR()
 //        print("resp startMonitoring" + String(self.testRate!))
         print("monitoring...")
     }
@@ -235,6 +241,51 @@ class HealthKitManager: ObservableObject {
                 if (self.testHeartRate ?? 72 > 105) {
                     self.triggerEmergencyResponse()
                     print("heart rate is higher than 105!")
+                }
+                
+            }
+            
+        }
+        healthStore.execute(query)
+    }
+    
+    func monitorActualHR() {
+        guard let actualHRType = HKObjectType.quantityType(forIdentifier: .heartRate) else {
+            return
+        }
+        
+        let query = HKObserverQuery(sampleType: actualHRType, predicate: nil) { [weak self] query, completionHandler, error in
+            if let error = error {
+                print("Error observing heart rate: \(error.localizedDescription)")
+                return
+            }
+            self?.fetchActualHRData()
+            completionHandler()
+            print("monitoring heart rate...")
+        }
+        healthStore.execute(query)
+    }
+
+
+    func fetchActualHRData() {
+        guard let actualHRType = HKObjectType.quantityType(forIdentifier: .heartRate) else {
+            return
+        }
+        
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+           
+        let query = HKSampleQuery(sampleType: actualHRType, predicate: nil, limit: 1, sortDescriptors: [sortDescriptor]) { (query, results, error) in
+            guard let sample = results?.first as? HKQuantitySample else { return }
+            let heart_rate = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: HKUnit.minute()))
+            print("is heart rate??")
+            
+            self.testActualHeartRate = heart_rate
+            
+            DispatchQueue.main.async {
+                self.testActualHeartRate = Double(self.testActualHeartRate ?? 72)
+                if (self.testActualHeartRate ?? 72 > 120) {
+                    self.triggerEmergencyResponse()
+                    print("heart rate is higher than 110!")
                 }
                 
             }
