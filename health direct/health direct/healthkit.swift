@@ -13,9 +13,9 @@ class HealthKitManager: ObservableObject {
     private let healthStore = HKHealthStore()
     
     @Published var isAuthorized: Bool = false
-    @Published var lastRespRate: Double?
-    @Published var lastSystolicBP: Double?
-    @Published var lastDiastolicBP: Double?
+    @Published var testRate: Double?
+    @Published var testSystolic: Double?
+    @Published var testDiastolic: Double?
     
     init() {
         requestPermission()
@@ -84,10 +84,19 @@ class HealthKitManager: ObservableObject {
             let testRate = 35
             print("is resp rate ok??")
             DispatchQueue.main.async {
-                self.lastRespRate = testRate
+                self.testRate = testRate
                 if testRate > 30 {
-                    self.triggerEmergencyResponse()
-                    print("resp rate is greater than 20 breaths per min!!")
+                    print("seems like resp rate is not, actly. wait a sec")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                        print("+5 sec delay, let's check again")
+                        if testRate > 30 {
+                            self.triggerEmergencyResponse()
+                            print("resp rate is greater than 30 breaths per min!!")
+                        }
+                        else {
+                            print("nope, we all good, whew!")
+                        }
+                    }                
                 }
             }
         }
@@ -104,10 +113,19 @@ class HealthKitManager: ObservableObject {
             let testSystolic = 200
             print("is bp systolic ok??")
             DispatchQueue.main.async {
-                self.lastSystolicBP = testSystolic
+                self.testSystolic = testSystolic
                 if testSystolic > 180 {
-                    self.triggerEmergencyResponse()
-                    print("blood pressure is higher than 180/120!!")
+                    print("seems like bp systolic is not, actly. wait a sec")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                        print("+5 sec delay, let's check again")
+                        if testSystolic > 180 {
+                            self.triggerEmergencyResponse()
+                            print("bp systolic is greater than 180!!")
+                        }
+                        else {
+                            print("nope, we all good, whew!")
+                        }
+                    }                
                 }
             }
         }
@@ -118,10 +136,19 @@ class HealthKitManager: ObservableObject {
             let testDiastolic = 130
             print("is bp diastolic ok??")
             DispatchQueue.main.async {
-                self.lastDiastolicBP = testDiastolic
+                self.testDiastolic = testDiastolic
                 if testDiastolic > 120 {
-                    self.triggerEmergencyResponse()
-                    print("blood pressure is higher than 180/120!!")
+                    print("seems like bp diastolic is not, actly. wait a sec")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                        print("+5 sec delay, let's check again")
+                        if testDiastolic > 120 {
+                            self.triggerEmergencyResponse()
+                            print("bp diastolic is greater than 120!!")
+                        }
+                        else {
+                            print("nope, we all good, whew!")
+                        }
+                    }                
                 }
             }
         }
@@ -147,13 +174,13 @@ struct HealthKitView: View {
                     .font(.headline)
                     .padding()
                 
-                if let respRate = healthKitManager.lastRespRate {
+                if let respRate = healthKitManager.testRate {
                     Text("Respiratory Rate: \(respRate, specifier: "%.2f") breaths/min")
                         .padding()
                         .foregroundColor(respRate > 30 ? .red : .primary)
                 }
                 
-                if let systolic = healthKitManager.lastSystolicBP, let diastolic = healthKitManager.lastDiastolicBP {
+                if let systolic = healthKitManager.testSystolic, let diastolic = healthKitManager.testDiastolic {
                     Text("Blood Pressure: \(systolic, specifier: "%.2f") / \(diastolic, specifier: "%.2f") mmHg")
                         .padding()
                         .foregroundColor(systolic > 180 ? .red : .primary)
