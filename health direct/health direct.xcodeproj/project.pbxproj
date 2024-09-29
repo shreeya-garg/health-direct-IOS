@@ -10,6 +10,8 @@
 		CE3421442CA8B0C100FC7FDC /* healthkit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3421432CA8B0C100FC7FDC /* healthkit.swift */; };
 		CE43948F2CA8D09400BDFC20 /* health-direct-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CE43948E2CA8D09400BDFC20 /* health-direct-Info.plist */; };
 		CE573B832CA958E200BABC53 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE573B822CA958E200BABC53 /* SpeechManager.swift */; };
+		CE573B852CA95DF500BABC53 /* healthModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE573B842CA95DF500BABC53 /* healthModel.swift */; };
+		CE573B882CA966D900BABC53 /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = CE573B872CA966D900BABC53 /* GoogleGenerativeAI */; };
 		CEB5F4182CA889C9003C7515 /* health_directApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB5F4172CA889C9003C7515 /* health_directApp.swift */; };
 		CEB5F41A2CA889C9003C7515 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB5F4192CA889C9003C7515 /* ContentView.swift */; };
 		CEB5F41C2CA889CB003C7515 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEB5F41B2CA889CB003C7515 /* Assets.xcassets */; };
@@ -41,6 +43,7 @@
 		CE3421432CA8B0C100FC7FDC /* healthkit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = healthkit.swift; sourceTree = "<group>"; };
 		CE43948E2CA8D09400BDFC20 /* health-direct-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "health-direct-Info.plist"; sourceTree = SOURCE_ROOT; };
 		CE573B822CA958E200BABC53 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
+		CE573B842CA95DF500BABC53 /* healthModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = healthModel.swift; sourceTree = "<group>"; };
 		CEB5F4142CA889C9003C7515 /* health direct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "health direct.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB5F4172CA889C9003C7515 /* health_directApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = health_directApp.swift; sourceTree = "<group>"; };
 		CEB5F4192CA889C9003C7515 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -58,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE573B882CA966D900BABC53 /* GoogleGenerativeAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +113,7 @@
 				CEB5F41B2CA889CB003C7515 /* Assets.xcassets */,
 				CEB5F41D2CA889CB003C7515 /* Preview Content */,
 				CE3421432CA8B0C100FC7FDC /* healthkit.swift */,
+				CE573B842CA95DF500BABC53 /* healthModel.swift */,
 			);
 			path = "health direct";
 			sourceTree = "<group>";
@@ -154,6 +159,9 @@
 			dependencies = (
 			);
 			name = "health direct";
+			packageProductDependencies = (
+				CE573B872CA966D900BABC53 /* GoogleGenerativeAI */,
+			);
 			productName = "health direct";
 			productReference = CEB5F4142CA889C9003C7515 /* health direct.app */;
 			productType = "com.apple.product-type.application";
@@ -226,6 +234,9 @@
 				Base,
 			);
 			mainGroup = CEB5F40B2CA889C9003C7515;
+			packageReferences = (
+				CE573B862CA9649B00BABC53 /* XCRemoteSwiftPackageReference "generative-ai-swift" */,
+			);
 			productRefGroup = CEB5F4152CA889C9003C7515 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -273,6 +284,7 @@
 				CE573B832CA958E200BABC53 /* SpeechManager.swift in Sources */,
 				CE3421442CA8B0C100FC7FDC /* healthkit.swift in Sources */,
 				CEB5F4182CA889C9003C7515 /* health_directApp.swift in Sources */,
+				CE573B852CA95DF500BABC53 /* healthModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -606,6 +618,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CE573B862CA9649B00BABC53 /* XCRemoteSwiftPackageReference "generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/generative-ai-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CE573B872CA966D900BABC53 /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE573B862CA9649B00BABC53 /* XCRemoteSwiftPackageReference "generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CEB5F40C2CA889C9003C7515 /* Project object */;
 }

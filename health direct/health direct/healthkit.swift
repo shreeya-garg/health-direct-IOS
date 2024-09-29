@@ -300,14 +300,15 @@ class HealthKitManager: ObservableObject {
     }
     
     func triggerEmergencyResponse() {
-        validEmergency = true
-        //navigateToEmergency = true
-        if (validEmergency) {
-            let speechManager = SpeechManager()
-           // soundManager.playAlertSound()
-            speechManager.configureAudioSession()
-            speechManager.speakText("User is potentially facing a medical emergency. Please select no or write any situational context in the textbox provided.")
-        }
+        let speechManager = SpeechManager()
+        speechManager.configureAudioSession()
+            self.validEmergency = true
+            //navigateToEmergency = true
+            if (self.validEmergency) {
+                // soundManager.playAlertSound()
+                
+                speechManager.speakText("User is potentially facing a medical emergency. Please select no or write any situational context in the textbox provided.")
+            }
     }
 
 }

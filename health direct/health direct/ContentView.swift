@@ -254,7 +254,7 @@ struct SubmitConfirmationView: View {
                 
             }
 
-            NavigationLink(destination: EmergencyView(healthKitManager: viewModel), isActive: $viewModel.validEmergency) {
+            NavigationLink(destination: EmergencyView(healthKitManager: viewModel, medications: medications, med_conditions: med_conditions, dailyWaterIntake: dailyWaterIntake, age: age, sex: sex), isActive: $viewModel.validEmergency) {
                                 EmptyView()
             }
 
@@ -318,7 +318,14 @@ struct SubmitConfirmationView: View {
 struct EmergencyView: View {
     @ObservedObject var healthKitManager: HealthKitManager
     @State var context: String = ""
-
+    @State var responseNavigate: Bool = false;
+   
+    var medications: String
+    var med_conditions: String
+    var dailyWaterIntake: String
+    var age: String
+    var sex: String
+    
     var body: some View {
         VStack {
             Text("Emergency detected. Please provide additional context.")
@@ -327,6 +334,10 @@ struct EmergencyView: View {
                 "",
                 text: $context
             )
+            .onSubmit {
+                print("on subnit called")
+                responseNavigate = true
+            }
             .cornerRadius(15)
             .background(Color.white)
             .shadow(radius:5)
@@ -334,7 +345,12 @@ struct EmergencyView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                 .stroke(Color.red, lineWidth: 2) // Outline color and width
+            
         )
+            NavigationLink(destination: ResponseView(healthKitManager: healthKitManager, medications: medications, med_conditions: med_conditions, dailyWaterIntake: dailyWaterIntake, age: age, sex: sex, context: context), isActive: $responseNavigate) {
+                                EmptyView()
+        }
+            
 
             
 //            Button("False Alarm") {
@@ -349,6 +365,47 @@ struct EmergencyView: View {
 //            }
         }
     }
+}
+
+struct ResponseView: View {
+    let healthModel = MedicalAssistant()
+    @ObservedObject var healthKitManager: HealthKitManager
+    @State var medicalResponse: String = "loading"
+  
+    var medications: String
+    var med_conditions: String
+    var dailyWaterIntake: String
+    var age: String
+    var sex: String
+    var context: String
+    let speech =  SpeechManager()
+    
+    var body: some View {
+        NavigationView{
+            VStack {
+                Text(medicalResponse)
+                    .padding()
+                    .multilineTextAlignment(.center)
+            }
+            .padding()
+            .task {
+                do {
+                    
+                    speech.configureAudioSession()
+                    
+                    medicalResponse = try await healthModel.generateMedicalResponse(
+                        userHistory: "\(sex) user, age \(age), has \(med_conditions) and takes these medications\(medications)",
+                        biometricData: "resting heart rate is \($healthKitManager.testHeartRate). heart rate is \($healthKitManager.testActualHeartRate). blood pressure is \(healthKitManager.testSystolic) over \(healthKitManager.testDiastolic). respritaory rate is \(healthKitManager.testRate)",
+                        context: "" + context
+                    )
+                    
+                    speech.speakText(medicalResponse)
+                } catch {
+                    medicalResponse = "Error: \(error.localizedDescription)"
+                }
+            }
+        }
+       }
 }
 
 
