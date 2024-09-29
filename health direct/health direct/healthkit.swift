@@ -43,6 +43,7 @@ class HealthKitManager: ObservableObject {
     func startMonitoring() {
         monitorRespRate()
         monitorBP()
+        print("monitoring...")
     }
     
     func monitorRespRate() {
@@ -54,6 +55,7 @@ class HealthKitManager: ObservableObject {
             }
             self?.fetchRespRateData()
             completionHandler()
+            print("monitoring respiratory rate...")
         }
         healthStore.execute(query)
     }
@@ -69,6 +71,7 @@ class HealthKitManager: ObservableObject {
             }
             self?.fetchBPData()
             completionHandler()
+            print("monitoring blood pressure...")
         }
         healthStore.execute(query)
     }
@@ -78,10 +81,13 @@ class HealthKitManager: ObservableObject {
         let query = HKSampleQuery(sampleType: respRateType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
             guard let sample = results?.first as? HKQuantitySample else { return }
             let rate = sample.quantity.doubleValue(for: HKUnit(from: "breaths/min"))
+            let testRate = 35
+            print("is resp rate ok??")
             DispatchQueue.main.async {
-                self.lastRespRate = rate
-                if rate > 30 {
+                self.lastRespRate = testRate
+                if testRate > 30 {
                     self.triggerEmergencyResponse()
+                    print("resp rate is greater than 20 breaths per min!!")
                 }
             }
         }
@@ -95,10 +101,13 @@ class HealthKitManager: ObservableObject {
         let systolicQuery = HKSampleQuery(sampleType: systolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
             guard let sample = results?.first as? HKQuantitySample else { return }
             let systolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
+            let testSystolic = 200
+            print("is bp systolic ok??")
             DispatchQueue.main.async {
-                self.lastSystolicBP = systolic
-                if systolic > 180 {
+                self.lastSystolicBP = testSystolic
+                if testSystolic > 180 {
                     self.triggerEmergencyResponse()
+                    print("blood pressure is higher than 180/120!!")
                 }
             }
         }
@@ -106,8 +115,14 @@ class HealthKitManager: ObservableObject {
         let diastolicQuery = HKSampleQuery(sampleType: diastolicType, predicate: nil, limit: 1, sortDescriptors: nil) { (query, results, error) in
             guard let sample = results?.first as? HKQuantitySample else { return }
             let diastolic = sample.quantity.doubleValue(for: HKUnit.millimeterOfMercury())
+            let testDiastolic = 130
+            print("is bp diastolic ok??")
             DispatchQueue.main.async {
-                self.lastDiastolicBP = diastolic
+                self.lastDiastolicBP = testDiastolic
+                if testDiastolic > 120 {
+                    self.triggerEmergencyResponse()
+                    print("blood pressure is higher than 180/120!!")
+                }
             }
         }
         
@@ -116,7 +131,7 @@ class HealthKitManager: ObservableObject {
     }
     
     func triggerEmergencyResponse() {
-        print("Emergency detected! Triggering response...")
+        print("Emergency detected! listen up folks...")
         // You can implement text-to-speech or any other response mechanism here
     }
 }
