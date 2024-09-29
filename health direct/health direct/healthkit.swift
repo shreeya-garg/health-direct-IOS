@@ -84,7 +84,7 @@ class HealthKitManager: ObservableObject {
             let testRate = 35
             print("is resp rate ok??")
             DispatchQueue.main.async {
-                self.lastRespRate = testRate
+                self.lastRespRate = Double(testRate)
                 if testRate > 30 {
                     self.triggerEmergencyResponse()
                     print("resp rate is greater than 20 breaths per min!!")
@@ -104,7 +104,7 @@ class HealthKitManager: ObservableObject {
             let testSystolic = 200
             print("is bp systolic ok??")
             DispatchQueue.main.async {
-                self.lastSystolicBP = testSystolic
+                self.lastSystolicBP = Double(testSystolic)
                 if testSystolic > 180 {
                     self.triggerEmergencyResponse()
                     print("blood pressure is higher than 180/120!!")
@@ -118,7 +118,7 @@ class HealthKitManager: ObservableObject {
             let testDiastolic = 130
             print("is bp diastolic ok??")
             DispatchQueue.main.async {
-                self.lastDiastolicBP = testDiastolic
+                self.lastDiastolicBP = Double(testDiastolic)
                 if testDiastolic > 120 {
                     self.triggerEmergencyResponse()
                     print("blood pressure is higher than 180/120!!")
