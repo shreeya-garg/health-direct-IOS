@@ -8,7 +8,7 @@ class MedicalAssistant {
     init() {
         self.generativeModel = GenerativeModel(
             name: "tunedModels/medical-response-prompt-kvnavv2r69ea",
-            apiKey: "AIzaSyCNG5vSVGUiXco8hEI4qsX49xs1uBEsStU"
+            apiKey: ProcessInfo.processInfo.environment[("GEMINI_API_KEY")] ?? ""
         )
     }
     
