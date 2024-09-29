@@ -158,6 +158,7 @@ func format_information(medications: String, med_conditions: String, age: String
 
 
 struct SubmitConfirmationView: View {
+    @ObservedObject var viewModel = HealthKitManager()
     let speechManager = SpeechManager()
     
     var body: some View {
